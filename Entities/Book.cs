@@ -1,5 +1,4 @@
-﻿
-namespace BookDemo.Models;
+﻿namespace Entities;
 
 public class Book
 {

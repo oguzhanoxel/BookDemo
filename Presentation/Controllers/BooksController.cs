@@ -1,19 +1,19 @@
-﻿using BookDemo.Models;
-using BookDemo.Repositories;
+﻿using Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Services.Contracts;
 
-namespace BookDemo.Controllers;
+namespace Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class BooksController : ControllerBase
 {
-	private readonly AppDbContext _context;
+	private readonly IServiceManager _manager;
 
-	public BooksController(AppDbContext context)
+	public BooksController(IServiceManager manager)
 	{
-		_context = context;
+		_manager = manager;
 	}
 
 	[HttpGet]
@@ -21,7 +21,7 @@ public class BooksController : ControllerBase
 	{
 		try
 		{
-			var books = _context.Books.ToList();
+			var books = _manager.BookService.GetAll(false);
 			return Ok(books);
 		}
 		catch (Exception ex)
@@ -35,10 +35,7 @@ public class BooksController : ControllerBase
 	{
 		try
 		{
-			var book = _context
-				.Books
-				.Where(b => b.Id.Equals(id))
-				.SingleOrDefault();
+			var book = _manager.BookService.GetById(id, false);
 
 			if (book is null) return NotFound();
 			return Ok(book);
@@ -54,8 +51,7 @@ public class BooksController : ControllerBase
 	{
 		try
 		{
-			_context.Books.Add((Book)dto);
-			_context.SaveChanges();
+			_manager.BookService.Create((Book)dto);
 			return StatusCode(201, dto);
 		}
 		catch (Exception ex)
@@ -65,20 +61,12 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpPut("{id:int}")]
-	public IActionResult UpdateBook([FromRoute]int id, [FromBody] UpdateBookDto dto)
+	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookDto dto)
 	{
 		try
 		{
-			var book = _context
-				.Books
-				.SingleOrDefault(b => b.Id.Equals(id));
-
-			if (book is null) return NotFound();
-			book.Title = dto.Title;
-			book.Price = dto.Price;
-			_context.Books.Update(book);
-			_context.SaveChanges();
-			return Ok(dto);
+			var result = _manager.BookService.Update(id, (Book)dto, true);
+			return Ok(result);
 		}
 		catch (Exception ex)
 		{
@@ -87,22 +75,11 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpDelete("{id:int}")]
-	public IActionResult DeleteBook([FromRoute]int id)
+	public IActionResult DeleteBook([FromRoute] int id)
 	{
 		try
 		{
-			var book = _context
-				.Books
-				.SingleOrDefault(b => b.Id.Equals(id));
-
-			if (book is null) return NotFound(new
-			{
-				statusCode = 404,
-				message = $"Book with id:{id} could not found."
-			});
-
-			_context.Books.Remove(book);
-			_context.SaveChanges();
+			_manager.BookService.Delete(id, false);
 			return NoContent();
 		}
 		catch (Exception ex)
@@ -116,15 +93,12 @@ public class BooksController : ControllerBase
 	{
 		try
 		{
-			var book = _context
-				.Books
-				.SingleOrDefault(b => b.Id.Equals(id));
+			var book = _manager.BookService.GetById(id, true);
 
 			if (book is null) return NotFound();
 
 			updated.ApplyTo(book);
-			_context.Books.Update(book);
-			_context.SaveChanges();
+			_manager.BookService.Update(book.Id, book, true);
 			return NoContent();
 		}
 		catch (Exception ex)
@@ -133,3 +107,4 @@ public class BooksController : ControllerBase
 		}
 	}
 }
+
