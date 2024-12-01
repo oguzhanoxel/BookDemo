@@ -8,20 +8,16 @@ namespace WebApi.Extentions;
 
 public static class ServicesExtentions
 {
-	public static void AddDbContextServices(this IServiceCollection services, IConfiguration configuration)
-	{
+	public static void AddAppDbContext(this IServiceCollection services, IConfiguration configuration) =>
 		services.AddDbContext<AppDbContext>(options =>
-			options.UseSqlServer(configuration.GetConnectionString("SqlConnection"))
-		);
-	}
+			options.UseSqlServer(configuration.GetConnectionString("SqlConnection")));
 
-	public static void AddRepositoryManager(this IServiceCollection services)
-	{
+	public static void AddRepositoryManager(this IServiceCollection services) =>
 		services.AddScoped<IRepositoryManager, RepositoryManager>();
-	}
 
-	public static void AddServiceManager(this IServiceCollection services)
-	{
+	public static void AddServiceManager(this IServiceCollection services) =>
 		services.AddScoped<IServiceManager, ServiceManager>();
-	}
+
+	public static void AddLoggerManager(this IServiceCollection services) =>
+		services.AddSingleton<ILoggerService, LoggerManager>();
 }

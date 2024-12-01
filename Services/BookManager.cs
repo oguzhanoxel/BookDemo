@@ -7,10 +7,12 @@ namespace Services;
 public class BookManager : IBookService
 {
 	private readonly IRepositoryManager _manager;
+	private readonly ILoggerService _logger;
 
-	public BookManager(IRepositoryManager manager)
+	public BookManager(IRepositoryManager manager, ILoggerService logger)
 	{
 		_manager = manager;
+		_logger = logger;
 	}
 
 	public Book Create(Book book)
@@ -23,7 +25,12 @@ public class BookManager : IBookService
 	public Book Delete(int id, bool trackChanges)
 	{
 		var entity = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
-		if (entity is null) throw new Exception($"Book with id:{id} could not found.");
+		if (entity is null)
+		{
+			string message = $"Book with id:{id} could not found.";
+			_logger.LogInfo(message);
+			throw new Exception(message);
+		}
 		_manager.Book.Delete(entity);
 		_manager.Save();
 		return entity;
@@ -42,7 +49,12 @@ public class BookManager : IBookService
 	public Book Update(int id, Book book, bool trackChanges)
 	{
 		var entity = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
-		if (entity is null) throw new Exception($"Book with id:{id} could not found.");
+		if (entity is null)
+		{
+			string message = $"Book with id:{id} could not found.";
+			_logger.LogInfo(message);
+			throw new Exception(message);
+		}
 
 		entity.Title = book.Title;
 		entity.Price = book.Price;

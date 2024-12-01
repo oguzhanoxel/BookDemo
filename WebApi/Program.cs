@@ -1,6 +1,10 @@
+using NLog;
 using WebApi.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LogManager.Setup()
+	.LoadConfigurationFromFile(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 // Add services to the container.
 
@@ -10,9 +14,10 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContextServices(builder.Configuration);
+builder.Services.AddAppDbContext(builder.Configuration);
 builder.Services.AddRepositoryManager();
 builder.Services.AddServiceManager();
+builder.Services.AddLoggerManager();
 
 var app = builder.Build();
 
