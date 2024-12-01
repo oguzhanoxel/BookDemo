@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using Entities.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
@@ -19,92 +19,46 @@ public class BooksController : ControllerBase
 	[HttpGet]
 	public IActionResult GetAllBooks()
 	{
-		try
-		{
-			var books = _manager.BookService.GetAll(false);
-			return Ok(books);
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		var books = _manager.BookService.GetAll(false);
+		return Ok(books);
 	}
 
 	[HttpGet("{id:int}")]
 	public IActionResult GetBookById(int id)
 	{
-		try
-		{
-			var book = _manager.BookService.GetById(id, false);
-
-			if (book is null) return NotFound();
-			return Ok(book);
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		var book = _manager.BookService.GetById(id, false);
+		return Ok(book);
 	}
 
 	[HttpPost]
 	public IActionResult CreateBook([FromBody] CreateBookDto dto)
 	{
-		try
-		{
-			_manager.BookService.Create((Book)dto);
-			return StatusCode(201, dto);
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		_manager.BookService.Create((Book)dto);
+		return StatusCode(201, dto);
 	}
 
 	[HttpPut("{id:int}")]
 	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookDto dto)
 	{
-		try
-		{
-			var result = _manager.BookService.Update(id, (Book)dto, true);
-			return Ok(result);
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		var result = _manager.BookService.Update(id, (Book)dto, true);
+		return Ok(result);
 	}
 
 	[HttpDelete("{id:int}")]
 	public IActionResult DeleteBook([FromRoute] int id)
 	{
-		try
-		{
-			_manager.BookService.Delete(id, false);
-			return NoContent();
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		_manager.BookService.Delete(id, false);
+		return NoContent();
 	}
 
 	[HttpPatch("{id:int}")]
-	public IActionResult UpdateFieldBook([FromRoute] int id, [FromBody] JsonPatchDocument<Book> updated)
+	public IActionResult UpdateBookField([FromRoute] int id, [FromBody] JsonPatchDocument<Book> updated)
 	{
-		try
-		{
-			var book = _manager.BookService.GetById(id, true);
+		var book = _manager.BookService.GetById(id, true);
 
-			if (book is null) return NotFound();
-
-			updated.ApplyTo(book);
-			_manager.BookService.Update(book.Id, book, true);
-			return NoContent();
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
-		}
+		updated.ApplyTo(book);
+		_manager.BookService.Update(book.Id, book, true);
+		return NoContent();
 	}
 }
 

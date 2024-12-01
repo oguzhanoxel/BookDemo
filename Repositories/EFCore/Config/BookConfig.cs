@@ -1,6 +1,6 @@
-﻿using Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Entities.Models;
 
 namespace Repositories.EFCore.Config;
 
