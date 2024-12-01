@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.DTOs.Book;
+using Entities.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
@@ -31,16 +32,16 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpPost]
-	public IActionResult CreateBook([FromBody] CreateBookDto dto)
+	public IActionResult CreateBook([FromBody] CreateBookRequestDto dto)
 	{
-		_manager.BookService.Create((Book)dto);
+		_manager.BookService.Create(dto);
 		return StatusCode(201, dto);
 	}
 
 	[HttpPut("{id:int}")]
-	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookDto dto)
+	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookRequestDto dto)
 	{
-		var result = _manager.BookService.Update(id, (Book)dto, true);
+		var result = _manager.BookService.Update(id, dto, true);
 		return Ok(result);
 	}
 
@@ -57,7 +58,7 @@ public class BooksController : ControllerBase
 		var book = _manager.BookService.GetById(id, true);
 
 		updated.ApplyTo(book);
-		_manager.BookService.Update(book.Id, book, true);
+		_manager.BookService.Update(book.Id, new UpdateBookRequestDto(book.Title, book.Price), true);
 		return NoContent();
 	}
 }

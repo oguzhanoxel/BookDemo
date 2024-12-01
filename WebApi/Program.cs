@@ -19,6 +19,7 @@ builder.Services.AddAppDbContext(builder.Configuration);
 builder.Services.AddRepositoryManager();
 builder.Services.AddServiceManager();
 builder.Services.AddLoggerManager();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
