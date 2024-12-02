@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 using Services.Contracts;
 using WebApi.Extentions;
@@ -12,6 +13,12 @@ LogManager.Setup()
 builder.Services.AddControllers()
 	.AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly)
 	.AddNewtonsoftJson();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+	options.SuppressModelStateInvalidFilter = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

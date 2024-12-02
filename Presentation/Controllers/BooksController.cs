@@ -34,6 +34,7 @@ public class BooksController : ControllerBase
 	[HttpPost]
 	public IActionResult CreateBook([FromBody] CreateBookRequestDto dto)
 	{
+		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 		_manager.BookService.Create(dto);
 		return StatusCode(201, dto);
 	}
@@ -41,6 +42,7 @@ public class BooksController : ControllerBase
 	[HttpPut("{id:int}")]
 	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookRequestDto dto)
 	{
+		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 		var result = _manager.BookService.Update(id, dto, true);
 		return Ok(result);
 	}
@@ -53,12 +55,14 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpPatch("{id:int}")]
-	public IActionResult UpdateBookField([FromRoute] int id, [FromBody] JsonPatchDocument<Book> updated)
+	public IActionResult UpdateBookField([FromRoute] int id, [FromBody] JsonPatchDocument<UpdateBookRequestDto> updated)
 	{
-		var book = _manager.BookService.GetById(id, true);
+		var book = _manager.BookService.GetBookForPatch(id, false);
+		updated.ApplyTo(book.dto, ModelState);
+		TryValidateModel(book.dto);
+		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
-		updated.ApplyTo(book);
-		_manager.BookService.Update(book.Id, new UpdateBookRequestDto(book.Title, book.Price), true);
+		_manager.BookService.SaveForPatch(book.dto, book.book);
 		return NoContent();
 	}
 }

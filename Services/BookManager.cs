@@ -20,45 +20,61 @@ public class BookManager : IBookService
 		_mapper = mapper;
 	}
 
-	public Book Create(CreateBookRequestDto dto)
+	public BookResponseDto Create(CreateBookRequestDto dto)
 	{
-		var mapped = _mapper.Map<Book>(dto);
-		_manager.Book.Create(mapped);
+		var book = _mapper.Map<Book>(dto);
+		_manager.Book.Create(book);
 		_manager.Save();
-		return mapped;
+		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public Book Delete(int id, bool trackChanges)
+	public BookResponseDto Delete(int id, bool trackChanges)
 	{
-		var entity = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
-		if (entity is null) throw new BookNotFoundException(id);
+		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		if (book is null) throw new BookNotFoundException(id);
 		
-		_manager.Book.Delete(entity);
+		_manager.Book.Delete(book);
 		_manager.Save();
-		return entity;
+		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public IEnumerable<Book> GetAll(bool trackChanges)
+	public IEnumerable<BookResponseDto> GetAll(bool trackChanges)
 	{
-		return _manager.Book.FindAll(trackChanges).ToList();
+		var entities = _manager.Book.FindAll(trackChanges).ToList();
+		return _mapper.Map<IEnumerable<BookResponseDto>>(entities);
 	}
 
-	public Book GetById(int id, bool trackChanges)
+	public (UpdateBookRequestDto dto, Book book) GetBookForPatch(int id, bool trackChanges)
 	{
-		var entity = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
-		if (entity is null) throw new BookNotFoundException(id);
+		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		if (book is null) throw new BookNotFoundException(id);
 
-		return entity;
+		var dto = _mapper.Map<UpdateBookRequestDto>(book);
+
+		return (dto, book);
 	}
 
-	public Book Update(int id, UpdateBookRequestDto dto, bool trackChanges)
+	public BookResponseDto GetById(int id, bool trackChanges)
 	{
-		var entity = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
-		if (entity is null) throw new BookNotFoundException(id);
+		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		if (book is null) throw new BookNotFoundException(id);
+		return _mapper.Map<BookResponseDto>(book);
+	}
 
-		_mapper.Map(dto, entity);
-		_manager.Book.Update(entity);
+	public void SaveForPatch(UpdateBookRequestDto dto, Book book)
+	{
+		_mapper.Map(dto, book);
 		_manager.Save();
-		return entity;
+	}
+
+	public BookResponseDto Update(int id, UpdateBookRequestDto dto, bool trackChanges)
+	{
+		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		if (book is null) throw new BookNotFoundException(id);
+
+		_mapper.Map(dto, book);
+		_manager.Book.Update(book);
+		_manager.Save();
+		return _mapper.Map<BookResponseDto>(book);
 	}
 }
