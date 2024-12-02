@@ -4,4 +4,5 @@ public interface IRepositoryManager
 {
 	IBookRepository Book { get; }
 	void Save();
+	Task SaveAsync();
 }

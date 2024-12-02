@@ -18,51 +18,51 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult GetAllBooks()
+	public async Task<IActionResult> GetAllBooksAsync()
 	{
-		var books = _manager.BookService.GetAll(false);
+		var books = await _manager.BookService.GetAllAsync(false);
 		return Ok(books);
 	}
 
 	[HttpGet("{id:int}")]
-	public IActionResult GetBookById(int id)
+	public async Task<IActionResult> GetBookByIdAsync(int id)
 	{
-		var book = _manager.BookService.GetById(id, false);
+		var book = await _manager.BookService.GetByIdAsync(id, false);
 		return Ok(book);
 	}
 
 	[HttpPost]
-	public IActionResult CreateBook([FromBody] CreateBookRequestDto dto)
+	public async Task<IActionResult> CreateBookAsync([FromBody] CreateBookRequestDto dto)
 	{
 		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
-		_manager.BookService.Create(dto);
+		await _manager.BookService.CreateAsync(dto);
 		return StatusCode(201, dto);
 	}
 
 	[HttpPut("{id:int}")]
-	public IActionResult UpdateBook([FromRoute] int id, [FromBody] UpdateBookRequestDto dto)
+	public async Task<IActionResult> UpdateBookAsync([FromRoute] int id, [FromBody] UpdateBookRequestDto dto)
 	{
 		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
-		var result = _manager.BookService.Update(id, dto, true);
+		var result = await _manager.BookService.UpdateAsync(id, dto, true);
 		return Ok(result);
 	}
 
 	[HttpDelete("{id:int}")]
-	public IActionResult DeleteBook([FromRoute] int id)
+	public async Task<IActionResult> DeleteBookAsync([FromRoute] int id)
 	{
-		_manager.BookService.Delete(id, false);
+		await _manager.BookService.DeleteAsync(id, false);
 		return NoContent();
 	}
 
 	[HttpPatch("{id:int}")]
-	public IActionResult UpdateBookField([FromRoute] int id, [FromBody] JsonPatchDocument<UpdateBookRequestDto> updated)
+	public async Task<IActionResult> UpdateBookFieldAsync([FromRoute] int id, [FromBody] JsonPatchDocument<UpdateBookRequestDto> updated)
 	{
-		var book = _manager.BookService.GetBookForPatch(id, false);
+		var book = await _manager.BookService.GetBookForPatchAsync(id, false);
 		updated.ApplyTo(book.dto, ModelState);
 		TryValidateModel(book.dto);
 		if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
 
-		_manager.BookService.SaveForPatch(book.dto, book.book);
+		await _manager.BookService.SaveForPatchAsync(book.dto, book.book);
 		return NoContent();
 	}
 }

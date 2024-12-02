@@ -20,33 +20,33 @@ public class BookManager : IBookService
 		_mapper = mapper;
 	}
 
-	public BookResponseDto Create(CreateBookRequestDto dto)
+	public async Task<BookResponseDto> CreateAsync(CreateBookRequestDto dto)
 	{
 		var book = _mapper.Map<Book>(dto);
 		_manager.Book.Create(book);
-		_manager.Save();
+		await _manager.SaveAsync();
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public BookResponseDto Delete(int id, bool trackChanges)
+	public async Task<BookResponseDto> DeleteAsync(int id, bool trackChanges)
 	{
-		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
 		if (book is null) throw new BookNotFoundException(id);
 		
 		_manager.Book.Delete(book);
-		_manager.Save();
+		await _manager.SaveAsync();
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public IEnumerable<BookResponseDto> GetAll(bool trackChanges)
+	public async Task<IEnumerable<BookResponseDto>> GetAllAsync(bool trackChanges)
 	{
-		var entities = _manager.Book.FindAll(trackChanges).ToList();
+		var entities = await _manager.Book.FindAllAsync(trackChanges);
 		return _mapper.Map<IEnumerable<BookResponseDto>>(entities);
 	}
 
-	public (UpdateBookRequestDto dto, Book book) GetBookForPatch(int id, bool trackChanges)
+	public async Task<(UpdateBookRequestDto dto, Book book)> GetBookForPatchAsync(int id, bool trackChanges)
 	{
-		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
 		if (book is null) throw new BookNotFoundException(id);
 
 		var dto = _mapper.Map<UpdateBookRequestDto>(book);
@@ -54,27 +54,28 @@ public class BookManager : IBookService
 		return (dto, book);
 	}
 
-	public BookResponseDto GetById(int id, bool trackChanges)
+	public async Task<BookResponseDto> GetByIdAsync(int id, bool trackChanges)
 	{
-		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
 		if (book is null) throw new BookNotFoundException(id);
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public void SaveForPatch(UpdateBookRequestDto dto, Book book)
+	public async Task SaveForPatchAsync(UpdateBookRequestDto dto, Book book)
 	{
 		_mapper.Map(dto, book);
-		_manager.Save();
+		_manager.Book.Update(book);
+		await _manager.SaveAsync();
 	}
 
-	public BookResponseDto Update(int id, UpdateBookRequestDto dto, bool trackChanges)
+	public async Task<BookResponseDto> UpdateAsync(int id, UpdateBookRequestDto dto, bool trackChanges)
 	{
-		var book = _manager.Book.FindByCondition(x => x.Id == id, trackChanges).SingleOrDefault();
+		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
 		if (book is null) throw new BookNotFoundException(id);
 
 		_mapper.Map(dto, book);
 		_manager.Book.Update(book);
-		_manager.Save();
+		await _manager.SaveAsync();
 		return _mapper.Map<BookResponseDto>(book);
 	}
 }

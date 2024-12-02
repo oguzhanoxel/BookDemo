@@ -2,7 +2,7 @@
 
 namespace Repositories.Contracts;
 
-public interface IBookRepository : IRepositoryBase<Book>
+public interface IBookRepository : IAsyncRepositoryBase<Book>, IRepositoryBase<Book>
 {
 
 }
