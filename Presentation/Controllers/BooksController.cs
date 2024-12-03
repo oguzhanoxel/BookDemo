@@ -1,9 +1,11 @@
 ﻿using Entities.DTOs.Book;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.ActionFilters;
 using Services.Contracts;
+using System.Text.Json;
 
 namespace Presentation.Controllers;
 
@@ -20,10 +22,13 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> GetAllBooksAsync()
+	public async Task<IActionResult> GetAllBooksAsync([FromQuery] PageRequestParameters requestParameters)
 	{
-		var books = await _manager.BookService.GetAllAsync(false);
-		return Ok(books);
+		var pagedBooks = await _manager.BookService
+			.GetAllAsync(requestParameters, false);
+		Response.Headers.Add("X-Pagination",
+			JsonSerializer.Serialize(pagedBooks.metaData));
+		return Ok(pagedBooks.books);
 	}
 
 	[HttpGet("{id:int}")]

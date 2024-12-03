@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities.RequestFeatures;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System.Linq.Expressions;
 
@@ -18,29 +19,40 @@ public abstract class RepositoryBase<T> : IAsyncRepositoryBase<T>, IRepositoryBa
 
 	public void Delete(T entity) => _context.Set<T>().Remove(entity);
 
-	public IQueryable<T> FindAll(bool trackChanges) =>
-		!trackChanges ?
-		_context.Set<T>().AsNoTracking() :
-		_context.Set<T>();
-
-	public async Task<List<T>> FindAllAsync(bool trackChanges)
+	public PagedList<T> FindAll(PageRequestParameters requestParameters, bool trackChanges)
 	{
-		return await (!trackChanges?
-		_context.Set<T>().AsNoTracking().ToListAsync() :
-		_context.Set<T>().ToListAsync());
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges)
+			query = query.AsNoTracking();
+
+		return PagedList<T>.ToPagedList(query, requestParameters.PageNumber, requestParameters.PageSize);
 	}
-		
 
-	public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
-		!trackChanges ?
-		_context.Set<T>().Where(expression).AsNoTracking() :
-		_context.Set<T>().Where(expression);
-
-	public async Task<List<T>> FindByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges)
+	public async Task<PagedList<T>> FindAllAsync(PageRequestParameters requestParameters, bool trackChanges)
 	{
-		return await(!trackChanges ?
-		_context.Set<T>().Where(expression).AsNoTracking().ToListAsync() :
-		_context.Set<T>().Where(expression).ToListAsync());
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges)
+			query = query.AsNoTracking();
+
+		return await PagedList<T>.ToPagedListAsync(query, requestParameters.PageNumber, requestParameters.PageSize);
+	}
+
+	public PagedList<T> FindByCondition(PageRequestParameters requestParameters, Expression<Func<T, bool>> expression, bool trackChanges)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges)
+			query = query.Where(expression).AsNoTracking();
+
+		return PagedList<T>.ToPagedList(query.Where(expression), requestParameters.PageNumber, requestParameters.PageSize);
+	}
+
+	public async Task<PagedList<T>> FindByConditionAsync(PageRequestParameters requestParameters, Expression<Func<T, bool>> expression, bool trackChanges)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges)
+			query = query.Where(expression).AsNoTracking();
+
+		return await PagedList<T>.ToPagedListAsync(query.Where(expression), requestParameters.PageNumber, requestParameters.PageSize);
 	}
 
 	public async Task<T> GetByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges)

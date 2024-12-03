@@ -29,6 +29,7 @@ builder.Services.AddServiceManager();
 builder.Services.AddLoggerManager();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddActionFilters();
+builder.Services.AddCorsConfig();
 
 var app = builder.Build();
 
@@ -49,6 +50,8 @@ if (app.Environment.IsProduction())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
