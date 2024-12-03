@@ -30,9 +30,8 @@ public class BookManager : IBookService
 
 	public async Task<BookResponseDto> DeleteAsync(int id, bool trackChanges)
 	{
-		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
-		if (book is null) throw new BookNotFoundException(id);
-		
+		Book? book = await GetBookIfIsExists(id, trackChanges);
+
 		_manager.Book.Delete(book);
 		await _manager.SaveAsync();
 		return _mapper.Map<BookResponseDto>(book);
@@ -46,8 +45,7 @@ public class BookManager : IBookService
 
 	public async Task<(UpdateBookRequestDto dto, Book book)> GetBookForPatchAsync(int id, bool trackChanges)
 	{
-		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
-		if (book is null) throw new BookNotFoundException(id);
+		Book? book = await GetBookIfIsExists(id, trackChanges);
 
 		var dto = _mapper.Map<UpdateBookRequestDto>(book);
 
@@ -56,8 +54,7 @@ public class BookManager : IBookService
 
 	public async Task<BookResponseDto> GetByIdAsync(int id, bool trackChanges)
 	{
-		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
-		if (book is null) throw new BookNotFoundException(id);
+		Book? book = await GetBookIfIsExists(id, trackChanges);
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
@@ -70,12 +67,18 @@ public class BookManager : IBookService
 
 	public async Task<BookResponseDto> UpdateAsync(int id, UpdateBookRequestDto dto, bool trackChanges)
 	{
-		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
-		if (book is null) throw new BookNotFoundException(id);
+		Book? book = await GetBookIfIsExists(id, trackChanges);
 
 		_mapper.Map(dto, book);
 		_manager.Book.Update(book);
 		await _manager.SaveAsync();
 		return _mapper.Map<BookResponseDto>(book);
+	}
+
+	private async Task<Book?> GetBookIfIsExists(int id, bool trackChanges)
+	{
+		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
+		if (book is null) throw new BookNotFoundException(id);
+		return book;
 	}
 }
