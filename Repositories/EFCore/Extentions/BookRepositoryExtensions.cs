@@ -1,4 +1,7 @@
 ﻿using Entities.Models;
+using System.Reflection;
+using System.Text;
+using System.Linq.Dynamic.Core;
 
 namespace Repositories.EFCore.Extentions;
 
@@ -15,5 +18,17 @@ public static class BookRepositoryExtensions
 
 		var lowerCaseTerm = searchTerm.Trim().ToLower();
 		return books.Where(x => x.Title.ToLower().Contains(searchTerm));
+	}
+
+	public static IQueryable<Book> Sort(this IQueryable<Book> books, string orderByQueryString)
+	{
+		if (string.IsNullOrWhiteSpace(orderByQueryString)) return books.OrderBy(x => x.Id);
+
+		var orderQuery = OrderQueryBuilder.CreateOrderQuery<Book>(orderByQueryString);
+
+		if (orderQuery is null)
+			return books.OrderBy(x => x.Id);
+
+		return books.OrderBy(orderQuery);
 	}
 }

@@ -17,7 +17,8 @@ public class BookRepository : RepositoryBase<Book>, IBookRepository
 	{
 		IQueryable<Book> query = GetAll(trackChanges, expression)
 			.FilterBooks(bookParameters.MinPrice, bookParameters.MaxPrice)
-			.Search(bookParameters.SearchTerm);
+			.Search(bookParameters.SearchTerm)
+			.Sort(bookParameters.OrderBy);
 		return PagedList<Book>.ToPagedList(query, bookParameters.PageNumber, bookParameters.PageSize);
 	}
 
@@ -25,7 +26,8 @@ public class BookRepository : RepositoryBase<Book>, IBookRepository
 	{
 		IQueryable<Book> query = GetAll(trackChanges, expression)
 			.FilterBooks(bookParameters.MinPrice, bookParameters.MaxPrice)
-			.Search(bookParameters.SearchTerm);
+			.Search(bookParameters.SearchTerm)
+			.Sort(bookParameters.OrderBy);
 		return await PagedList<Book>
 			.ToPagedListAsync(query, bookParameters.PageNumber, bookParameters.PageSize);
 	}
