@@ -5,8 +5,7 @@ namespace Repositories.Contracts;
 
 public interface IRepositoryBase<T>
 {
-	PagedList<T> GetAll(BookParameters bookParameters,
-		bool trackChanges, Expression<Func<T, bool>> expression = null);
+	IQueryable<T> GetAll(bool trackChanges, Expression<Func<T, bool>> expression = null);
 	T Get(bool trackChanges, Expression<Func<T, bool>> expression);
 	void Create(T entity);
 	void Update(T entity);

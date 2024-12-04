@@ -32,22 +32,12 @@ public abstract class RepositoryBase<T> : IAsyncRepositoryBase<T>, IRepositoryBa
 
 		return query.SingleOrDefaultAsync(expression);
 	}
-	public PagedList<T> GetAll(BookParameters bookParameters,
-		bool trackChanges, Expression<Func<T, bool>> expression = null)
+	public IQueryable<T> GetAll(bool trackChanges, Expression<Func<T, bool>> expression = null)
 	{
 		IQueryable<T> query = _context.Set<T>();
 		if (!trackChanges) query = query.AsNoTracking();
 		if (expression is not null) query = query.Where(expression);
 
-		return PagedList<T>.ToPagedList(query, bookParameters.PageNumber, bookParameters.PageSize);
-	}
-	public async Task<PagedList<T>> GetAllAsync(BookParameters bookParameters,
-		bool trackChanges, Expression<Func<T, bool>> expression = null)
-	{
-		IQueryable<T> query = _context.Set<T>();
-		if (!trackChanges) query = query.AsNoTracking();
-		if (expression is not null) query = query.Where(expression);
-
-		return await PagedList<T>.ToPagedListAsync(query, bookParameters.PageNumber, bookParameters.PageSize);
+		return query;
 	}
 }

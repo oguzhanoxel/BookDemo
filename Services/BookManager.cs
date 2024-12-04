@@ -5,6 +5,7 @@ using Entities.Models;
 using Entities.RequestFeatures;
 using Repositories.Contracts;
 using Services.Contracts;
+using System.Linq.Expressions;
 
 namespace Services;
 
@@ -40,6 +41,7 @@ public class BookManager : IBookService
 
 	public async Task<(IEnumerable<BookResponseDto> books, MetaData metaData)> GetAllAsync(BookParameters bookParameters, bool trackChanges)
 	{
+		if (!bookParameters.ValidPriceRange) throw new PriceOutOfRangeBadRequestException();
 		var pagedBookList = await _manager.Book.GetAllAsync(bookParameters, trackChanges);
 		var books = _mapper.Map<IEnumerable<BookResponseDto>>(pagedBookList);
 		return (books, pagedBookList.MetaData);
