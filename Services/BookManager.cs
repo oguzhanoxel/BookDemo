@@ -38,9 +38,9 @@ public class BookManager : IBookService
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public async Task<(IEnumerable<BookResponseDto> books, MetaData metaData)> GetAllAsync(PageRequestParameters requestParameters, bool trackChanges)
+	public async Task<(IEnumerable<BookResponseDto> books, MetaData metaData)> GetAllAsync(BookParameters bookParameters, bool trackChanges)
 	{
-		var pagedBookList = await _manager.Book.FindAllAsync(requestParameters, trackChanges);
+		var pagedBookList = await _manager.Book.GetAllAsync(bookParameters, trackChanges);
 		var books = _mapper.Map<IEnumerable<BookResponseDto>>(pagedBookList);
 		return (books, pagedBookList.MetaData);
 	}
@@ -79,7 +79,7 @@ public class BookManager : IBookService
 
 	private async Task<Book?> GetBookIfIsExists(int id, bool trackChanges)
 	{
-		var book = await _manager.Book.GetByConditionAsync(x => x.Id == id, trackChanges);
+		var book = await _manager.Book.GetAsync(trackChanges, x => x.Id == id);
 		if (book is null) throw new BookNotFoundException(id);
 		return book;
 	}

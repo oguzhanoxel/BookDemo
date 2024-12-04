@@ -16,51 +16,38 @@ public abstract class RepositoryBase<T> : IAsyncRepositoryBase<T>, IRepositoryBa
 	}
 
 	public void Create(T entity) => _context.Set<T>().Add(entity);
-
-	public void Delete(T entity) => _context.Set<T>().Remove(entity);
-
-	public PagedList<T> FindAll(PageRequestParameters requestParameters, bool trackChanges)
-	{
-		IQueryable<T> query = _context.Set<T>();
-		if (!trackChanges)
-			query = query.AsNoTracking();
-
-		return PagedList<T>.ToPagedList(query, requestParameters.PageNumber, requestParameters.PageSize);
-	}
-
-	public async Task<PagedList<T>> FindAllAsync(PageRequestParameters requestParameters, bool trackChanges)
-	{
-		IQueryable<T> query = _context.Set<T>();
-		if (!trackChanges)
-			query = query.AsNoTracking();
-
-		return await PagedList<T>.ToPagedListAsync(query, requestParameters.PageNumber, requestParameters.PageSize);
-	}
-
-	public PagedList<T> FindByCondition(PageRequestParameters requestParameters, Expression<Func<T, bool>> expression, bool trackChanges)
-	{
-		IQueryable<T> query = _context.Set<T>();
-		if (!trackChanges)
-			query = query.Where(expression).AsNoTracking();
-
-		return PagedList<T>.ToPagedList(query.Where(expression), requestParameters.PageNumber, requestParameters.PageSize);
-	}
-
-	public async Task<PagedList<T>> FindByConditionAsync(PageRequestParameters requestParameters, Expression<Func<T, bool>> expression, bool trackChanges)
-	{
-		IQueryable<T> query = _context.Set<T>();
-		if (!trackChanges)
-			query = query.Where(expression).AsNoTracking();
-
-		return await PagedList<T>.ToPagedListAsync(query.Where(expression), requestParameters.PageNumber, requestParameters.PageSize);
-	}
-
-	public async Task<T> GetByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges)
-	{
-		return await (!trackChanges ?
-		_context.Set<T>().Where(expression).AsNoTracking().SingleOrDefaultAsync() :
-		_context.Set<T>().Where(expression).SingleOrDefaultAsync());
-	}
-
 	public void Update(T entity) => _context.Set<T>().Update(entity);
+	public void Delete(T entity) => _context.Set<T>().Remove(entity);
+	public T Get(bool trackChanges, Expression<Func<T, bool>> expression)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges) query = query.AsNoTracking();
+
+		return query.SingleOrDefault(expression);
+	}
+	public Task<T> GetAsync(bool trackChanges, Expression<Func<T, bool>> expression)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges) query = query.AsNoTracking();
+
+		return query.SingleOrDefaultAsync(expression);
+	}
+	public PagedList<T> GetAll(BookParameters bookParameters,
+		bool trackChanges, Expression<Func<T, bool>> expression = null)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges) query = query.AsNoTracking();
+		if (expression is not null) query = query.Where(expression);
+
+		return PagedList<T>.ToPagedList(query, bookParameters.PageNumber, bookParameters.PageSize);
+	}
+	public async Task<PagedList<T>> GetAllAsync(BookParameters bookParameters,
+		bool trackChanges, Expression<Func<T, bool>> expression = null)
+	{
+		IQueryable<T> query = _context.Set<T>();
+		if (!trackChanges) query = query.AsNoTracking();
+		if (expression is not null) query = query.Where(expression);
+
+		return await PagedList<T>.ToPagedListAsync(query, bookParameters.PageNumber, bookParameters.PageSize);
+	}
 }

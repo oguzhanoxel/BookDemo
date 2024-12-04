@@ -1,6 +1,6 @@
 ﻿namespace Entities.RequestFeatures;
 
-public class PageRequestParameters
+public class RequestParameters
 {
 	const int maxPageSize = 50;
 

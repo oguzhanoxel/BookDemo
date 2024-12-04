@@ -22,10 +22,10 @@ public class BooksController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> GetAllBooksAsync([FromQuery] PageRequestParameters requestParameters)
+	public async Task<IActionResult> GetAllBooksAsync([FromQuery] BookParameters bookParameters)
 	{
 		var pagedBooks = await _manager.BookService
-			.GetAllAsync(requestParameters, false);
+			.GetAllAsync(bookParameters, false);
 		Response.Headers.Add("X-Pagination",
 			JsonSerializer.Serialize(pagedBooks.metaData));
 		return Ok(pagedBooks.books);

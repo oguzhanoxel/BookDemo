@@ -5,8 +5,9 @@ namespace Repositories.Contracts;
 
 public interface IRepositoryBase<T>
 {
-	PagedList<T> FindAll(PageRequestParameters requestParameters, bool trackChanges);
-	PagedList<T> FindByCondition(PageRequestParameters requestParameters, Expression<Func<T, bool>> expression, bool trackChanges);
+	PagedList<T> GetAll(BookParameters bookParameters,
+		bool trackChanges, Expression<Func<T, bool>> expression = null);
+	T Get(bool trackChanges, Expression<Func<T, bool>> expression);
 	void Create(T entity);
 	void Update(T entity);
 	void Delete(T entity);
