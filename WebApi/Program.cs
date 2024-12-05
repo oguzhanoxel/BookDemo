@@ -30,6 +30,7 @@ builder.Services.AddLoggerManager();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddActionFilters();
 builder.Services.AddCorsConfig();
+builder.Services.AddDataShaper();
 
 var app = builder.Build();
 

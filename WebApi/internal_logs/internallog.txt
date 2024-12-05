@@ -209,3 +209,13 @@
 2024-12-04 16:28:32.8208 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
 2024-12-04 16:28:32.8208 Info Validating config: TargetNames=logfile, console, ConfigItems=23, FilePath=C:\Users\oguzh\Desktop\btk\BookDemo\WebApi\nlog.config
 2024-12-04 16:28:32.8208 Info Configuration initialized.
+2024-12-05 11:17:01.7333 Info Registered target NLog.Targets.FileTarget(Name=logfile)
+2024-12-05 11:17:01.7391 Info Registered target NLog.Targets.ConsoleTarget(Name=console)
+2024-12-05 11:17:01.7391 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
+2024-12-05 11:17:01.7391 Info Validating config: TargetNames=logfile, console, ConfigItems=23, FilePath=C:\Users\oguzh\Desktop\btk\BookDemo\WebApi\nlog.config
+2024-12-05 11:17:01.7567 Info Configuration initialized.
+2024-12-05 11:57:53.6046 Info Registered target NLog.Targets.FileTarget(Name=logfile)
+2024-12-05 11:57:53.6046 Info Registered target NLog.Targets.ConsoleTarget(Name=console)
+2024-12-05 11:57:53.6136 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
+2024-12-05 11:57:53.6136 Info Validating config: TargetNames=logfile, console, ConfigItems=23, FilePath=C:\Users\oguzh\Desktop\btk\BookDemo\WebApi\nlog.config
+2024-12-05 11:57:53.6268 Info Configuration initialized.

@@ -5,7 +5,7 @@ using Entities.Models;
 using Entities.RequestFeatures;
 using Repositories.Contracts;
 using Services.Contracts;
-using System.Linq.Expressions;
+using System.Dynamic;
 
 namespace Services;
 
@@ -14,12 +14,14 @@ public class BookManager : IBookService
 	private readonly IRepositoryManager _manager;
 	private readonly ILoggerService _logger;
 	private readonly IMapper _mapper;
+	private readonly IDataShaper<BookResponseDto> _shaper;
 
-	public BookManager(IRepositoryManager manager, ILoggerService logger, IMapper mapper)
+	public BookManager(IRepositoryManager manager, ILoggerService logger, IMapper mapper, IDataShaper<BookResponseDto> shaper)
 	{
 		_manager = manager;
 		_logger = logger;
 		_mapper = mapper;
+		_shaper = shaper;
 	}
 
 	public async Task<BookResponseDto> CreateAsync(CreateBookRequestDto dto)
@@ -39,12 +41,13 @@ public class BookManager : IBookService
 		return _mapper.Map<BookResponseDto>(book);
 	}
 
-	public async Task<(IEnumerable<BookResponseDto> books, MetaData metaData)> GetAllAsync(BookParameters bookParameters, bool trackChanges)
+	public async Task<(IEnumerable<ExpandoObject> books, MetaData metaData)> GetAllAsync(BookParameters bookParameters, bool trackChanges)
 	{
 		if (!bookParameters.ValidPriceRange) throw new PriceOutOfRangeBadRequestException();
 		var pagedBookList = await _manager.Book.GetAllAsync(bookParameters, trackChanges);
 		var books = _mapper.Map<IEnumerable<BookResponseDto>>(pagedBookList);
-		return (books, pagedBookList.MetaData);
+		var shapedBooks = _shaper.ShapeData(books, bookParameters.Fields);
+		return (shapedBooks, pagedBookList.MetaData);
 	}
 
 	public async Task<(UpdateBookRequestDto dto, Book book)> GetBookForPatchAsync(int id, bool trackChanges)

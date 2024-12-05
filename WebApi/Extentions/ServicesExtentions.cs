@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities.DTOs.Book;
+using Microsoft.EntityFrameworkCore;
 using Presentation.ActionFilters;
 using Repositories.Contracts;
 using Repositories.EFCore;
@@ -38,5 +39,10 @@ public static class ServicesExtentions
 			.AllowAnyHeader()
 			.WithExposedHeaders("X-Pagination"));
 		});
+	}
+
+	public static void AddDataShaper(this IServiceCollection services)
+	{
+		services.AddScoped<IDataShaper<BookResponseDto>, DataShaper<BookResponseDto>>();
 	}
 }
